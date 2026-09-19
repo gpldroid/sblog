@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="scroll-smooth light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إخلاء المسؤولية</title>
+    
+    <!-- Google Fonts: Cairo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            900: '#1e3a8a',
+                        },
+                        accent: '#f97316'
+                    },
+                    fontFamily: {
+                        cairo: ['Cairo', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+        <link rel="stylesheet" href="../assets/css/style.css">
+
+</head>
+<body class="bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 min-h-screen flex flex-col">
+<!-- TOP BAR -->
+    <div class="bg-gray-900 text-gray-300 text-xs border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex flex-col sm:flex-row justify-between items-center gap-2">
+            
+            <!-- Date & Breaking News Ticker -->
+            <div class="flex items-center gap-3 w-full sm:w-auto overflow-hidden">
+                <span class="bg-brand-600 text-white px-2 py-0.5 rounded text-[10px] font-bold shrink-0">عاجل</span>
+                <span id="current-date" class="text-gray-400 shrink-0 hidden md:inline">السبت، 19 سبتمبر 2026</span>
+                <span class="text-gray-600 hidden md:inline">|</span>
+                <div class="h-5 overflow-hidden relative w-full sm:w-80 md:w-96">
+                    <ul class="animate-ticker text-ellipsis overflow-hidden whitespace-nowrap">
+                        <li class="h-5 flex items-center text-gray-200"><a href="../blogs/post-1.html" onclick="openArticle(1); return false;" class="hover:text-brand-500 truncate">إطلاق أول الأقمار الاصطناعية العربية لرصد التغيرات المناخية</a></li>
+                        <li class="h-5 flex items-center text-gray-200"><a href="../blogs/post-3.html" onclick="openArticle(3); return false;" class="hover:text-brand-500 truncate">ارتفاع مؤشرات الأسواق المالية العالمية عقب التقارير الاقتصادية الأخيرة</a></li>
+                        <li class="h-5 flex items-center text-gray-200"><a href="../blogs/post-2.html" onclick="openArticle(2); return false;" class="hover:text-brand-500 truncate">مؤتمر الذكاء الاصطناعي يناقش المستقبل الرقمي بالمنطقة</a></li>
+                        <li class="h-5 flex items-center text-gray-200"><a href="../blogs/post-6.html" onclick="openArticle(6); return false;" class="hover:text-brand-500 truncate">افتتاح المعرض الدولي للتكنولوجيا والابتكار</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Social Links & Dark Mode Toggle -->
+            <div class="flex items-center gap-4 shrink-0">
+                <div class="flex items-center gap-3">
+                    <a href="#" class="hover:text-brand-500 transition-colors" title="تويتر"><i class="fa-brands fa-x-twitter"></i></a>
+                    <a href="#" class="hover:text-brand-500 transition-colors" title="فيسبوك"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="#" class="hover:text-brand-500 transition-colors" title="انستغرام"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#" class="hover:text-brand-500 transition-colors" title="يوتيوب"><i class="fa-brands fa-youtube"></i></a>
+                </div>
+                <div class="h-3 w-px bg-gray-700"></div>
+                <button id="theme-toggle" class="flex items-center gap-1 hover:text-white transition-colors">
+                    <i id="theme-toggle-dark-icon" class="fa-solid fa-moon hidden"></i>
+                    <i id="theme-toggle-light-icon" class="fa-solid fa-sun hidden"></i>
+                    <span id="theme-toggle-text" class="text-[11px]">المظهر</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN HEADER -->
+    <header class="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                
+                <!-- Logo -->
+                <div class="flex items-center gap-3">
+                    <a href="../index.html"  class="flex items-center gap-3 group">
+                        <div class="w-10 h-10 bg-brand-600 text-white rounded-lg flex items-center justify-center font-black text-xl shadow-md group-hover:bg-brand-700 transition-colors">
+                            م
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-black text-gray-900 dark:text-white tracking-tight leading-none">مدونة الأخبار</h1>
+                            <p class="text-xs text-brand-600 dark:text-brand-400 font-semibold mt-1">البوابة الإخبارية الشاملة</p>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Header Banner Ad Unit (728x90 AdSense Slot) -->
+                <div class="w-full md:w-auto flex justify-center">
+                    <div class="adsense-placeholder w-full max-w-[728px] h-[90px] rounded-lg flex flex-col items-center justify-center p-2 text-center text-gray-400 relative overflow-hidden">
+                        <span class="text-[10px] uppercase tracking-widest text-gray-400 font-semibold mb-1">مساحة إعلانية</span>
+                        <div class="text-xs font-semibold text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                            <i class="fa-solid fa-rectangle-ad text-brand-500"></i> المساحة الإعلانية العلوية القياسية
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </header>
+
+    <!-- NAVIGATION BAR -->
+    <nav class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-14">
+                
+                <!-- Desktop Category Links -->
+                <div class="hidden md:flex items-center gap-1 font-medium text-sm">
+                    <button onclick="filterCategory('all')" class="nav-btn active px-3 py-2 rounded-md text-brand-600 dark:text-brand-400 font-bold bg-brand-50 dark:bg-gray-800 transition-all">الرئيسية</button>
+                    <button onclick="filterCategory('تقنية')" class="nav-btn px-3 py-2 rounded-md text-gray-700 dark:text-gray-200 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all">تقنية</button>
+                    <button onclick="filterCategory('ذكاء اصطناعي')" class="nav-btn px-3 py-2 rounded-md text-gray-700 dark:text-gray-200 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all">ذكاء اصطناعي</button>
+                    <button onclick="filterCategory('اقتصاد')" class="nav-btn px-3 py-2 rounded-md text-gray-700 dark:text-gray-200 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all">اقتصاد</button>
+                    <button onclick="filterCategory('رياضة')" class="nav-btn px-3 py-2 rounded-md text-gray-700 dark:text-gray-200 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all">رياضة</button>
+                    <button onclick="filterCategory('ثقافة')" class="nav-btn px-3 py-2 rounded-md text-gray-700 dark:text-gray-200 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all">ثقافة وفن</button>
+                    
+                    <!-- Dropdown Example -->
+                    <div class="relative group">
+                        <button class="px-3 py-2 rounded-md text-gray-700 dark:text-gray-200 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center gap-1 transition-all">
+                            المزيد <i class="fa-solid fa-chevron-down text-[10px]"></i>
+                        </button>
+                        <div class="absolute right-0 top-full hidden group-hover:block w-48 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow-xl py-2 z-50">
+                            <a href="#" onclick="filterCategory('علوم'); return false;" class="block px-4 py-2 text-xs text-gray-700 dark:text-gray-300 hover:bg-brand-50 dark:hover:bg-gray-800 hover:text-brand-600">علوم واكتشافات</a>
+                            <a href="#" onclick="filterCategory('سيارات'); return false;" class="block px-4 py-2 text-xs text-gray-700 dark:text-gray-300 hover:bg-brand-50 dark:hover:bg-gray-800 hover:text-brand-600">عالم السيارات</a>
+                            <a href="#" onclick="filterCategory('صحة'); return false;" class="block px-4 py-2 text-xs text-gray-700 dark:text-gray-300 hover:bg-brand-50 dark:hover:bg-gray-800 hover:text-brand-600">صحة ورشاقة</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search Bar -->
+                <div class="relative w-full md:w-64">
+                    <input type="text" id="search-input" placeholder="بحث في الأخبار والمقالات..." class="w-full pl-9 pr-4 py-1.5 text-xs rounded-full border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent text-gray-900 dark:text-gray-100 transition-all">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-gray-400 text-xs"></i>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-btn" class="md:hidden p-2 rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800">
+                    <i class="fa-solid fa-bars text-lg"></i>
+                </button>
+
+            </div>
+        </div>
+
+        <!-- Mobile Menu Drawer -->
+        <div id="mobile-menu" class="hidden md:hidden border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 pt-2 pb-4 space-y-1">
+            <button onclick="filterCategory('all'); toggleMobileMenu();" class="block w-full text-right px-3 py-2 rounded-md text-sm font-semibold text-brand-600">الرئيسية</button>
+            <button onclick="filterCategory('تقنية'); toggleMobileMenu();" class="block w-full text-right px-3 py-2 rounded-md text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">تقنية</button>
+            <button onclick="filterCategory('ذكاء اصطناعي'); toggleMobileMenu();" class="block w-full text-right px-3 py-2 rounded-md text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">ذكاء اصطناعي</button>
+            <button onclick="filterCategory('اقتصاد'); toggleMobileMenu();" class="block w-full text-right px-3 py-2 rounded-md text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">اقتصاد</button>
+            <button onclick="filterCategory('رياضة'); toggleMobileMenu();" class="block w-full text-right px-3 py-2 rounded-md text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">رياضة</button>
+            <button onclick="filterCategory('ثقافة'); toggleMobileMenu();" class="block w-full text-right px-3 py-2 rounded-md text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">ثقافة وفن</button>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT CONTAINER -->
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
+  <div class="mb-5 border-r-4 border-brand-600 pr-3">
+    <h1 class="text-xl font-black text-gray-900 dark:text-white">إخلاء المسؤولية</h1>
+  </div>
+  <div id="disclaimerModal" class="modal-box fixed inset-x-4 top-10 md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-2xl max-h-[85vh] bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-2xl z-50 overflow-y-auto hidden border border-gray-200 dark:border-gray-800">
+        <div class="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 pb-3 mb-4">
+            <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation text-brand-600"></i> إخلاء المسؤولية</h3>
+            <button onclick="closeModal('disclaimerModal')" class="text-gray-400 hover:text-gray-600 dark:hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+        </div>
+        <div class="text-xs text-gray-600 dark:text-gray-300 space-y-3 leading-relaxed">
+            <p>المعلومات الواردة في هذا الموقع هي لأغراض الإعلام العام فقط. بينما نسعى لتقديم معلومات دقيقة ومحدثة، لا نقدم أي إقرارات أو ضمانات من أي نوع، صريحة أو ضمنية، حول اكتمال أو دقة أو ملاءمة المعلومات.</p>
+            <p>المقالات التي تتناول استشارات مالية أو تقنية تعتبر وجهات نظر ولا تعبر عن توصيات استثمارية حتمية.</p>
+        </div>
+    </div>
+
+    <!-- 5. Contact Us Modal -->
+</main>
+<footer class="bg-gray-900 text-gray-300 mt-16 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+                
+                <!-- About Column -->
+                <div class="space-y-4">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 bg-brand-600 text-white rounded flex items-center justify-center font-black text-base">م</div>
+                        <span class="text-lg font-bold text-white">مدونة الأخبار</span>
+                    </div>
+                    <p class="text-xs text-gray-400 leading-relaxed">
+                        منصة إخبارية ومجلة إلكترونية شاملة تقدم أحدث الأخبار والتقارير في مجالات التكنولوجيا، الاقتصاد، والذكاء الاصطناعي بكل حيادية وموضوعية.
+                    </p>
+                    <div class="flex items-center gap-3 pt-2">
+                        <a href="#" class="w-8 h-8 rounded-lg bg-gray-800 flex items-center justify-center text-gray-400 hover:text-white hover:bg-brand-600 transition-colors"><i class="fa-brands fa-x-twitter text-xs"></i></a>
+                        <a href="#" class="w-8 h-8 rounded-lg bg-gray-800 flex items-center justify-center text-gray-400 hover:text-white hover:bg-brand-600 transition-colors"><i class="fa-brands fa-facebook-f text-xs"></i></a>
+                        <a href="#" class="w-8 h-8 rounded-lg bg-gray-800 flex items-center justify-center text-gray-400 hover:text-white hover:bg-brand-600 transition-colors"><i class="fa-brands fa-instagram text-xs"></i></a>
+                        <a href="#" class="w-8 h-8 rounded-lg bg-gray-800 flex items-center justify-center text-gray-400 hover:text-white hover:bg-brand-600 transition-colors"><i class="fa-brands fa-youtube text-xs"></i></a>
+                    </div>
+                </div>
+
+                <!-- Navigation Quick Links -->
+                <div>
+                    <h4 class="text-sm font-bold text-white mb-4 border-r-2 border-brand-500 pr-2">أقسام الموقع</h4>
+                    <ul class="space-y-2 text-xs text-gray-400">
+                        <li><a href="#" onclick="filterCategory('تقنية'); return false;" class="hover:text-white transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-left text-[9px] text-brand-500"></i> تقنية وتكنولوجيا</a></li>
+                        <li><a href="#" onclick="filterCategory('ذكاء اصطناعي'); return false;" class="hover:text-white transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-left text-[9px] text-brand-500"></i> الذكاء الاصطناعي</a></li>
+                        <li><a href="#" onclick="filterCategory('اقتصاد'); return false;" class="hover:text-white transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-left text-[9px] text-brand-500"></i> اقتصاد ومالية</a></li>
+                        <li><a href="#" onclick="filterCategory('رياضة'); return false;" class="hover:text-white transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-left text-[9px] text-brand-500"></i> أخبار الرياضة</a></li>
+                    </ul>
+                </div>
+
+                <!-- STANDALONE LEGAL PAGES LINKS (PAGES FOLDER DIRECTORY) -->
+                <div>
+                    <h4 class="text-sm font-bold text-white mb-4 border-r-2 border-brand-500 pr-2">الصفحات الإدارية والقانونية</h4>
+                    <ul class="space-y-2 text-xs text-gray-400">
+                        <li><a href="../pages/privacy.html"  class="hover:text-white transition-colors flex items-center gap-2"><i class="fa-solid fa-shield-halved text-[10px] text-brand-500"></i> سياسة الخصوصية</a></li>
+                        <li><a href="../pages/about.html"  class="hover:text-white transition-colors flex items-center gap-2"><i class="fa-solid fa-circle-info text-[10px] text-brand-500"></i> من نحن</a></li>
+                        <li><a href="../pages/terms.html"  class="hover:text-white transition-colors flex items-center gap-2"><i class="fa-solid fa-file-contract text-[10px] text-brand-500"></i> الشروط والأحكام</a></li>
+                        <li><a href="../pages/disclaimer.html"  class="hover:text-white transition-colors flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation text-[10px] text-brand-500"></i> إخلاء المسؤولية</a></li>
+                        <li><a href="../pages/contact.html"  class="hover:text-white transition-colors flex items-center gap-2"><i class="fa-solid fa-envelope text-[10px] text-brand-500"></i> اتصل بنا</a></li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <!-- Bottom Copyright Bar -->
+            <div class="border-t border-gray-800 pt-6 flex flex-col sm:flex-row justify-between items-center text-xs text-gray-500 gap-4">
+                <p>© 2026 جميع الحقوق محفوظة لمدونة الأخبار اليومية.</p>
+                <div class="flex items-center gap-4">
+                    <a href="../index.html" class="hover:text-gray-300">الرئيسية</a>
+                    <span>•</span>
+                    <a href="../pages/privacy.html"  class="hover:text-gray-300">سياسة الخصوصية</a>
+                    <span>•</span>
+                    <a href="../pages/contact.html"  class="hover:text-gray-300">الدعم الفني</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- MODALS FOR QUICK STANDALONE PREVIEW FALLBACK -->
+<script src="../assets/js/main.js" defer></script>
+</body>
+</html>
