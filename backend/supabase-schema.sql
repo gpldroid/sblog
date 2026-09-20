@@ -1,5 +1,6 @@
--- sblog / Supabase schema
--- Run once in Supabase SQL Editor.
+-- sblog / Supabase secure schema
+-- Run this file in Supabase SQL Editor.
+-- IMPORTANT: never expose the service_role/secret key in the frontend.
 
 create extension if not exists pgcrypto;
 
@@ -52,6 +53,14 @@ create table if not exists public.pages (
   updated_at timestamptz not null default now()
 );
 
+-- Roles are stored separately from Auth. Never trust a client-provided role.
+create table if not exists public.profiles (
+  id uuid primary key references auth.users(id) on delete cascade,
+  role text not null default 'editor' check (role in ('admin','editor')),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 insert into public.site_settings (id) values (1) on conflict (id) do nothing;
 
 insert into public.categories (name,slug) values
@@ -73,53 +82,151 @@ alter table public.categories enable row level security;
 alter table public.posts enable row level security;
 alter table public.site_settings enable row level security;
 alter table public.pages enable row level security;
+alter table public.profiles enable row level security;
 
-drop policy if exists "public read categories" on public.categories;
-create policy "public read categories" on public.categories for select to anon, authenticated using (true);
+-- Security helper: SECURITY DEFINER avoids recursive profile RLS checks.
+create or replace function public.is_admin()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from public.profiles
+    where id = auth.uid() and role = 'admin'
+  );
+$$;
 
-drop policy if exists "public read published posts" on public.posts;
-create policy "public read published posts" on public.posts for select to anon, authenticated using (status='published');
+create or replace function public.is_editor_or_admin()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from public.profiles
+    where id = auth.uid() and role in ('admin','editor')
+  );
+$$;
 
+revoke all on function public.is_admin() from public;
+grant execute on function public.is_admin() to authenticated;
+revoke all on function public.is_editor_or_admin() from public;
+grant execute on function public.is_editor_or_admin() to authenticated;
+
+-- Drop the old broad authenticated policies.
 drop policy if exists "authenticated manage posts" on public.posts;
-create policy "authenticated manage posts" on public.posts for all to authenticated using (true) with check (true);
-
-drop policy if exists "public read settings" on public.site_settings;
-create policy "public read settings" on public.site_settings for select to anon, authenticated using (true);
-
 drop policy if exists "authenticated manage settings" on public.site_settings;
-create policy "authenticated manage settings" on public.site_settings for all to authenticated using (true) with check (true);
-
-drop policy if exists "public read published pages" on public.pages;
-create policy "public read published pages" on public.pages for select to anon, authenticated using (status='published');
-
 drop policy if exists "authenticated manage pages" on public.pages;
-create policy "authenticated manage pages" on public.pages for all to authenticated using (true) with check (true);
+drop policy if exists "public read categories" on public.categories;
+drop policy if exists "public read published posts" on public.posts;
+drop policy if exists "public read settings" on public.site_settings;
+drop policy if exists "public read published pages" on public.pages;
+drop policy if exists "authenticated read profiles" on public.profiles;
+drop policy if exists "admin manage profiles" on public.profiles;
 
+-- Public read policies.
+create policy "public read categories" on public.categories
+for select to anon, authenticated using (true);
+
+create policy "public read published posts" on public.posts
+for select to anon, authenticated using (status = 'published');
+
+create policy "public read settings" on public.site_settings
+for select to anon, authenticated using (true);
+
+create policy "public read published pages" on public.pages
+for select to anon, authenticated using (status = 'published');
+
+-- Editors/admins manage editorial content.
+create policy "editor admin manage posts" on public.posts
+for all to authenticated
+using (public.is_editor_or_admin())
+with check (public.is_editor_or_admin());
+
+create policy "editor admin manage categories" on public.categories
+for all to authenticated
+using (public.is_editor_or_admin())
+with check (public.is_editor_or_admin());
+
+create policy "editor admin manage pages" on public.pages
+for all to authenticated
+using (public.is_editor_or_admin())
+with check (public.is_editor_or_admin());
+
+-- Only administrators can change global site settings.
+create policy "admin manage settings" on public.site_settings
+for all to authenticated
+using (public.is_admin())
+with check (public.is_admin());
+
+-- A user can read only their own profile; admins can manage roles.
+create policy "users read own profile" on public.profiles
+for select to authenticated
+using (id = auth.uid() or public.is_admin());
+
+create policy "admin manage profiles" on public.profiles
+for all to authenticated
+using (public.is_admin())
+with check (public.is_admin());
+
+-- Storage: public media can be viewed, but only editorial users can modify it.
 insert into storage.buckets (id,name,public) values ('media','media',true)
 on conflict (id) do update set public=true;
 
 drop policy if exists "public read media" on storage.objects;
-create policy "public read media" on storage.objects for select to anon, authenticated using (bucket_id='media');
-
 drop policy if exists "authenticated upload media" on storage.objects;
-create policy "authenticated upload media" on storage.objects for insert to authenticated with check (bucket_id='media');
-
 drop policy if exists "authenticated update media" on storage.objects;
-create policy "authenticated update media" on storage.objects for update to authenticated using (bucket_id='media') with check (bucket_id='media');
-
 drop policy if exists "authenticated delete media" on storage.objects;
-create policy "authenticated delete media" on storage.objects for delete to authenticated using (bucket_id='media');
+
+create policy "public read media" on storage.objects
+for select to anon, authenticated using (bucket_id = 'media');
+
+create policy "editor admin upload media" on storage.objects
+for insert to authenticated
+with check (bucket_id = 'media' and public.is_editor_or_admin());
+
+create policy "editor admin update media" on storage.objects
+for update to authenticated
+using (bucket_id = 'media' and public.is_editor_or_admin())
+with check (bucket_id = 'media' and public.is_editor_or_admin());
+
+create policy "editor admin delete media" on storage.objects
+for delete to authenticated
+using (bucket_id = 'media' and public.is_editor_or_admin());
 
 create or replace function public.set_updated_at()
-returns trigger language plpgsql as $$
-begin new.updated_at=now(); return new; end;
+returns trigger
+language plpgsql
+as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
 $$;
 
 drop trigger if exists posts_updated_at on public.posts;
-create trigger posts_updated_at before update on public.posts for each row execute function public.set_updated_at();
+create trigger posts_updated_at before update on public.posts
+for each row execute function public.set_updated_at();
 
 drop trigger if exists settings_updated_at on public.site_settings;
-create trigger settings_updated_at before update on public.site_settings for each row execute function public.set_updated_at();
+create trigger settings_updated_at before update on public.site_settings
+for each row execute function public.set_updated_at();
 
 drop trigger if exists pages_updated_at on public.pages;
-create trigger pages_updated_at before update on public.pages for each row execute function public.set_updated_at();
+create trigger pages_updated_at before update on public.pages
+for each row execute function public.set_updated_at();
+
+drop trigger if exists profiles_updated_at on public.profiles;
+create trigger profiles_updated_at before update on public.profiles
+for each row execute function public.set_updated_at();
+
+-- BOOTSTRAP ADMIN:
+-- After creating the first user in Supabase Authentication > Users,
+-- run this once, replacing the UUID:
+-- insert into public.profiles (id, role) values ('AUTH_USER_UUID_HERE', 'admin')
+-- on conflict (id) do update set role = 'admin';
