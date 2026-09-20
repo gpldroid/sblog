@@ -1,5 +1,5 @@
 import {SITE} from './config.js';
-const state={posts:[],category:'all',query:''};
+const params=new URLSearchParams(location.search);const state={posts:[],category:params.get('category')||'all',query:params.get('search')||''};
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const el=id=>document.getElementById(id);
 function postUrl(p){return 'posts/'+p.slug+'.html'}
