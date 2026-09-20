@@ -1,0 +1,1 @@
+export const SITE={name:'مدونة الأخبار اليومية',baseUrl:'https://gpldroid.github.io/sblog/',description:'البوابة الإخبارية الشاملة',postsPath:'data/posts.json',categories:['تقنية','ذكاء اصطناعي','اقتصاد','رياضة','ثقافة','علوم','سيارات','صحة']};
