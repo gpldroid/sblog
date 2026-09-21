@@ -2,7 +2,7 @@ import {supabase,backendReady} from '../assets/js/backend.js';
 
 const app=document.getElementById('admin-app');
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const state={posts:[],view:'dashboard'};
+const state={posts:[],view:'dashboard',role:null};
 
 function input(id,label,value,required){
  return '<label class="block text-xs font-bold">'+label+'<input id="'+id+'" '+(required?'required':'')+' value="'+esc(value)+'" class="w-full border rounded-lg p-3 mt-1 bg-transparent"></label>';
@@ -19,7 +19,7 @@ function login(){
 }
 
 function shell(){
- app.innerHTML='<div class="min-h-screen"><header class="bg-gray-900 text-gray-200 border-b border-gray-800"><div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row gap-3 items-center justify-between"><div><h1 class="text-xl font-black text-white">لوحة تحكم الأخبار</h1><p class="text-xs text-gray-400">إدارة المحتوى والإعدادات</p></div><div class="flex gap-2"><a href="../index.html" class="px-3 py-2 rounded-lg bg-gray-800 text-xs">عرض الموقع</a><button id="logout" class="px-3 py-2 rounded-lg bg-red-600 text-white text-xs">تسجيل الخروج</button></div></div></header><main class="max-w-7xl mx-auto px-4 py-6"><nav class="flex flex-wrap gap-2 mb-6"><button data-view="dashboard" class="admin-tab px-4 py-2 rounded-lg bg-brand-600 text-white text-xs font-bold">الرئيسية</button><button data-view="posts" class="admin-tab px-4 py-2 rounded-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-xs font-bold">المقالات</button><button data-view="settings" class="admin-tab px-4 py-2 rounded-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-xs font-bold">إعدادات الموقع</button></nav><section id="panel"></section></main></div>';
+ app.innerHTML='<div class="min-h-screen"><header class="bg-gray-900 text-gray-200 border-b border-gray-800"><div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row gap-3 items-center justify-between"><div><h1 class="text-xl font-black text-white">لوحة تحكم الأخبار</h1><p class="text-xs text-gray-400">إدارة المحتوى والإعدادات</p></div><div class="flex gap-2"><a href="../index.html" class="px-3 py-2 rounded-lg bg-gray-800 text-xs">عرض الموقع</a><button id="logout" class="px-3 py-2 rounded-lg bg-red-600 text-white text-xs">تسجيل الخروج</button></div></div></header><main class="max-w-7xl mx-auto px-4 py-6"><nav class="flex flex-wrap gap-2 mb-6"><button data-view="dashboard" class="admin-tab px-4 py-2 rounded-lg bg-brand-600 text-white text-xs font-bold">الرئيسية</button><button data-view="posts" class="admin-tab px-4 py-2 rounded-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-xs font-bold">المقالات</button>'+(state.role==='admin'?'<button data-view="settings" class="admin-tab px-4 py-2 rounded-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-xs font-bold">إعدادات الموقع</button>':'')+'</nav><section id="panel"></section></main></div>';
  document.querySelectorAll('.admin-tab').forEach(b=>b.onclick=()=>{state.view=b.dataset.view;render()});
  document.getElementById('logout').onclick=async()=>{await supabase.auth.signOut();location.reload()};
 }
@@ -57,12 +57,18 @@ async function settings(){
  document.getElementById('settings-form').onsubmit=async e=>{e.preventDefault();const r2=await supabase.from('site_settings').upsert({id:1,site_name:val('site_name'),tagline:val('tagline'),logo_text:val('logo_text'),description:val('description')});if(r2.error)alert(r2.error.message);else alert('تم الحفظ')};
 }
 
-function render(){if(state.view==='dashboard')dashboard();else if(state.view==='posts')posts();else settings()}
+function render(){if(state.view==='settings'&&state.role!=='admin'){state.view='dashboard'}if(state.view==='dashboard')dashboard();else if(state.view==='posts')posts();else settings()}
 async function loadPosts(){const r=await supabase.from('posts').select('*').order('created_at',{ascending:false});if(r.error)throw r.error;state.posts=r.data||[]}
 async function init(){
  if(!backendReady){app.innerHTML='<main class="min-h-screen flex items-center justify-center p-6"><div class="max-w-xl bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-xl"><h1 class="text-xl font-black mb-3">Backend غير مُفعّل</h1><p class="text-sm leading-7 text-gray-500">عدّل assets/js/backend-config.js وأضف Project URL وPublishable/Anon Key ثم اجعل enabled=true.</p></div></main>';return}
  const s=await supabase.auth.getSession();
  if(!s.data.session){login();return}
+ const profile=await supabase.from('profiles').select('role').eq('id',s.data.session.user.id).maybeSingle();
+ if(profile.error||!profile.data||!['admin','editor'].includes(profile.data.role)){
+  await supabase.auth.signOut();
+  app.innerHTML='<main class="min-h-screen flex items-center justify-center p-6"><div class="max-w-xl bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-xl border border-red-200"><h1 class="text-xl font-black mb-3">لا توجد صلاحيات إدارة</h1><p class="text-sm leading-7 text-gray-500">هذا الحساب مصادق عليه، لكنه غير مُسجّل كمدير أو محرر في جدول profiles.</p></div></main>';return;
+ }
+ state.role=profile.data.role;
  shell();await loadPosts();render();
 }
 init();
