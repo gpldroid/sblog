@@ -21,10 +21,11 @@ function shell(){
 }
 async function load(){
  shell();let p=null;
- if(backendReady){const r=await supabase.from('posts').select('*').eq('slug',slug).eq('status','published').maybeSingle();if(r.data)p=normalizePost(r.data)}
- if(!p){const r=await fetch('data/posts.json');const all=await r.json();p=all.find(x=>x.slug===slug)}
+ if(backendReady){try{const r=await supabase.from('posts').select('*').eq('slug',slug).eq('status','published').maybeSingle();if(r.error)throw r.error;if(r.data)p=normalizePost(r.data)}catch(e){console.warn('Supabase unavailable; using static post data.',e)}}
+ if(!p){const r=await fetch('data/posts.json',{cache:'no-store'});if(!r.ok)throw new Error('posts');const all=await r.json();p=all.find(x=>x.slug===slug)}
  if(!p){document.getElementById('post-view').innerHTML='<div class="p-10 text-center"><h1 class="text-xl font-black">المقال غير موجود</h1><a class="text-brand-600 text-sm" href="index.html">العودة</a></div>';return}
- document.title=esc(p.title)+' | مدونة الأخبار اليومية';
+ document.title=esc(p.seoTitle||p.title)+' | مدونة الأخبار اليومية';
+ document.querySelector('meta[name="description"]')?.setAttribute('content',p.seoDescription||p.excerpt||'');
  document.getElementById('post-view').innerHTML='<img src="'+esc(p.image)+'" alt="'+esc(p.title)+'" class="w-full max-h-[520px] object-cover"><div class="p-6 sm:p-10"><span class="bg-brand-600 text-white text-xs font-bold px-3 py-1 rounded">'+esc(p.category)+'</span><h1 class="text-2xl sm:text-4xl font-black mt-4 leading-tight">'+esc(p.title)+'</h1><div class="text-xs text-gray-500 mt-3">'+esc(p.author)+' · '+esc(p.date)+'</div><div class="mt-8 text-sm leading-8 whitespace-pre-line">'+esc(p.content)+'</div></div>';
 }
 load();
